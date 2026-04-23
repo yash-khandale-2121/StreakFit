@@ -10,17 +10,23 @@ export default function Navbar({ user, isRunning, isPaused }) {
   const { logout } = useAuth();
   const { connected } = useSocket();
   const location = useLocation();
-  const [open, setOpen] = useState(false);
-  const [showPicker, setShowPicker] = useState(false);
+  const [open,         setOpen]         = useState(false);
+  const [mobileOpen,   setMobileOpen]   = useState(false);
+  const [showPicker,   setShowPicker]   = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const dropRef = useRef(null);
 
   // Close dropdown on outside click
   useEffect(() => {
-    const handler = (e) => { if (dropRef.current && !dropRef.current.contains(e.target)) setOpen(false); };
+    const handler = (e) => {
+      if (dropRef.current && !dropRef.current.contains(e.target)) setOpen(false);
+    };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
   // Poll for pending friend requests
   useEffect(() => {
@@ -46,6 +52,7 @@ export default function Navbar({ user, isRunning, isPaused }) {
     { to: '/leaderboard', icon: '🏆', label: 'Leaderboard' },
     { to: '/social',      icon: '👥', label: 'Social',     badge: pendingCount },
     { to: '/profile',     icon: '🎮', label: 'Profile'     },
+    { to: '/settings',    icon: '⚙️', label: 'Settings'    },
   ];
 
   return (
@@ -59,9 +66,9 @@ export default function Navbar({ user, isRunning, isPaused }) {
           </div>
         </div>
 
-        {/* Nav links */}
+        {/* Desktop nav links */}
         <div className="nav-links">
-          {navLinks.map(link => (
+          {navLinks.filter(l => l.to !== '/settings').map(link => (
             <Link
               key={link.to}
               to={link.to}
@@ -75,8 +82,8 @@ export default function Navbar({ user, isRunning, isPaused }) {
         </div>
 
         <div className="nav-right-group">
-          {/* Run status */}
-          <div className="nav-status">
+          {/* Run status — hidden on mobile */}
+          <div className="nav-status nav-status-desktop">
             <div className={`nav-status-dot ${runStatus.cls}`} />
             <span>{runStatus.label}</span>
           </div>
@@ -84,8 +91,8 @@ export default function Navbar({ user, isRunning, isPaused }) {
           {/* Notification bell */}
           <NotificationBell user={user} />
 
-          {/* User menu */}
-          <div className="nav-right" ref={dropRef}>
+          {/* User menu (desktop) */}
+          <div className="nav-right nav-right-desktop" ref={dropRef}>
             <button id="btn-nav-user" className="nav-user" onClick={() => setOpen(o => !o)}>
               <div className="avatar" style={{ background: user?.color || '#4ade80' }}>
                 {(user?.username || '?')[0].toUpperCase()}
@@ -116,8 +123,65 @@ export default function Navbar({ user, isRunning, isPaused }) {
               </div>
             )}
           </div>
+
+          {/* Hamburger button (mobile only) */}
+          <button
+            className={`nav-hamburger ${mobileOpen ? 'open' : ''}`}
+            onClick={() => setMobileOpen(o => !o)}
+            aria-label="Toggle menu"
+          >
+            <span /><span /><span />
+          </button>
         </div>
       </nav>
+
+      {/* Mobile menu overlay */}
+      {mobileOpen && (
+        <div className="mobile-menu-overlay" onClick={() => setMobileOpen(false)}>
+          <div className="mobile-menu" onClick={e => e.stopPropagation()}>
+            {/* User header */}
+            <div className="mobile-menu-user">
+              <div className="avatar lg" style={{ background: user?.color || '#4ade80' }}>
+                {(user?.username || '?')[0].toUpperCase()}
+              </div>
+              <div>
+                <div className="mobile-menu-name">{user?.username}</div>
+                <div className="mobile-menu-sub">{(user?.xp || 0).toLocaleString()} XP · Lv {user?.level || 1}</div>
+              </div>
+              {/* Run status in mobile menu */}
+              <div className="mobile-run-status">
+                <div className={`nav-status-dot ${runStatus.cls}`} />
+                <span>{runStatus.label}</span>
+              </div>
+            </div>
+
+            {/* Nav links */}
+            <div className="mobile-menu-links">
+              {navLinks.map(link => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={`mobile-menu-link ${location.pathname === link.to ? 'active' : ''}`}
+                >
+                  <span className="mobile-link-icon">{link.icon}</span>
+                  <span>{link.label}</span>
+                  {link.badge > 0 && <span className="nav-badge">{link.badge}</span>}
+                </Link>
+              ))}
+            </div>
+
+            {/* Bottom actions */}
+            <div className="mobile-menu-footer">
+              <button className="mobile-color-btn" onClick={() => { setShowPicker(true); setMobileOpen(false); }}>
+                🎨 Change Territory Color
+              </button>
+              <button className="mobile-logout-btn" onClick={logout}>
+                🚪 Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showPicker && <ColorPicker onClose={() => setShowPicker(false)} />}
     </>
