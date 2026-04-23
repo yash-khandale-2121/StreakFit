@@ -1,23 +1,20 @@
 services:
   - type: web
-    name: territory-run
+    name: StreakFit
     env: node
     region: oregon
     plan: free
-    rootDir: server
-    buildCommand: npm install && npm run build
+    buildCommand: npm run build && cd server && npm install
     startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        generateValue: false
       - key: MONGODB_URI
-        sync: false          # you set this manually in Render dashboard
+        sync: false
       - key: JWT_SECRET
-        generateValue: true  # Render auto-generates a strong secret
+        generateValue: true
       - key: CLIENT_URL
-        sync: false          # set to your Render URL e.g. https://territory-run.onrender.com
+        sync: false
       - key: GOOGLE_CLIENT_ID
-        sync: false          # paste your Google OAuth client ID
+        sync: false
     healthCheckPath: /api/health
