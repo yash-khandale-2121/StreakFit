@@ -417,6 +417,12 @@ a:hover { text-decoration: underline; }
   .map-wrap { width: 100%; }
 }
 
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 2rem 1.25rem;
+  }
+}
+
 /* ════════════════════════════════════════════════════════════════
    NAVBAR UPDATES — nav links & new elements
 ════════════════════════════════════════════════════════════════ */

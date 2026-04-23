@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
@@ -10,6 +10,19 @@ export default function Login() {
   const [form, setForm]     = useState({ email: '', password: '' });
   const [error, setError]   = useState('');
   const [loading, setLoading] = useState(false);
+  const [btnWidth, setBtnWidth] = useState(360);
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    const updateWidth = () => {
+      if (wrapperRef.current) {
+        setBtnWidth(wrapperRef.current.offsetWidth);
+      }
+    };
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
 
   const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -61,7 +74,7 @@ export default function Login() {
 
           <div className="auth-divider"><span>or</span></div>
 
-          <div className="google-btn-wrapper">
+          <div className="google-btn-wrapper" ref={wrapperRef}>
             <GoogleLogin
               onSuccess={handleGoogle}
               onError={() => setError('Google sign-in failed')}
@@ -69,7 +82,7 @@ export default function Login() {
               shape="rectangular"
               size="large"
               text="signin_with"
-              width="360"
+              width={String(btnWidth)}
             />
           </div>
 
