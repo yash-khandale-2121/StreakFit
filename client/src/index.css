@@ -412,10 +412,6 @@ a:hover { text-decoration: underline; }
 @keyframes xp-glow     { 0%,100% { box-shadow: 0 0 0 0 rgba(167,139,250,0); } 50% { box-shadow: 0 0 16px 4px rgba(167,139,250,0.2); } }
 
 /* ── RESPONSIVE ─────────────────────────────────────────────── */
-@media (max-width: 768px) {
-  .sidebar { display: none; }
-  .map-wrap { width: 100%; }
-}
 
 @media (max-width: 480px) {
   .auth-card {
@@ -954,7 +950,7 @@ a:hover { text-decoration: underline; }
   display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
 }
 @media (max-width: 900px) { .pr-grid { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 600px) { .pr-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 600px) { .pr-grid { grid-template-columns: 1fr; } }
 
 .pr-card {
   display: flex; align-items: center; gap: .9rem;
@@ -979,15 +975,17 @@ a:hover { text-decoration: underline; }
 ════════════════════════════════════════════════════════════════ */
 .run-table {
   background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-  overflow: hidden;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
 }
 .run-table-head {
   display: grid; grid-template-columns: 90px 90px 80px 100px 70px 90px 80px;
+  min-width: 600px;
   padding: .65rem 1.1rem; background: var(--bg); border-bottom: 1px solid var(--border);
   font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted);
 }
 .run-table-row {
   display: grid; grid-template-columns: 90px 90px 80px 100px 70px 90px 80px;
+  min-width: 600px;
   padding: .75rem 1.1rem; border-bottom: 1px solid var(--border);
   font-size: .83rem; transition: background .15s; align-items: center;
 }
@@ -1812,29 +1810,31 @@ a.friend-avatar { text-decoration: none; display: flex; align-items: center; jus
   .page-header { margin-bottom: 1rem; }
 
   /* ── Dashboard ── */
-  .dashboard-layout {
+  .dashboard-body {
     flex-direction: column !important;
     height: auto !important;
   }
-  .map-section {
+  .map-wrap {
     width: 100% !important;
     height: 52vw !important;
     min-height: 220px;
     max-height: 340px;
+    flex: none !important;
   }
-  .dashboard-sidebar {
+  .sidebar {
     width: 100% !important;
     height: auto !important;
     border-left: none !important;
     border-top: 1px solid var(--border);
+    flex: 1 !important;
   }
   .sidebar-tabs    { overflow-x: auto; gap: .2rem; padding: .3rem .5rem; }
-  .sidebar-tab     { font-size: .72rem; padding: .4rem .55rem; white-space: nowrap; }
-  .sidebar-content { max-height: 280px; overflow-y: auto; padding: .5rem; }
-  .sidebar-footer  { padding: .5rem .75rem; }
+  .tab-btn         { font-size: .72rem; padding: .4rem .55rem; white-space: nowrap; }
+  .sidebar-content { max-height: none; overflow-y: auto; padding: .5rem; padding-bottom: 80px; }
+  .sidebar-footer  { padding: .5rem .75rem; padding-bottom: 80px; }
 
   /* Run controls — fixed bottom bar */
-  .run-controls {
+  .control-buttons {
     position: fixed !important;
     bottom: 0; left: 0; right: 0; z-index: 500;
     border-radius: 0 !important;
@@ -1845,8 +1845,9 @@ a.friend-avatar { text-decoration: none; display: flex; align-items: center; jus
     background: rgba(15,15,20,.95) !important;
     backdrop-filter: blur(16px);
     padding-bottom: max(.6rem, env(safe-area-inset-bottom)) !important;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.5) !important;
   }
-  .btn-start, .btn-stop, .btn-pause, .btn-simulate {
+  .ctrl-start, .ctrl-stop, .ctrl-pause, .ctrl-sim {
     font-size: .8rem !important; padding: .6rem .9rem !important;
   }
   .recenter-btn { bottom: 68px !important; left: .75rem !important; }
@@ -1916,7 +1917,7 @@ a.friend-avatar { text-decoration: none; display: flex; align-items: center; jus
   .nav-title { font-size: .82rem; }
   .nav-logo  { font-size: 1rem; }
 
-  .stats-grid, .kpi-grid { grid-template-columns: 1fr !important; }
+  .stats-grid, .kpi-grid, .stats-live-extras { grid-template-columns: 1fr !important; }
   .up-stats-grid         { grid-template-columns: 1fr 1fr !important; }
 
   .lb-pill { font-size: .68rem; padding: .28rem .5rem; }

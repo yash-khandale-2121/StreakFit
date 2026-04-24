@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { GoogleLogin } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 
@@ -10,19 +9,6 @@ export default function Register() {
   const [form, setForm]     = useState({ username: '', email: '', password: '' });
   const [error, setError]   = useState('');
   const [loading, setLoading] = useState(false);
-  const [btnWidth, setBtnWidth] = useState(360);
-  const wrapperRef = useRef(null);
-
-  useEffect(() => {
-    const updateWidth = () => {
-      if (wrapperRef.current) {
-        setBtnWidth(wrapperRef.current.offsetWidth);
-      }
-    };
-    updateWidth();
-    window.addEventListener('resize', updateWidth);
-    return () => window.removeEventListener('resize', updateWidth);
-  }, []);
 
   const handle = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -39,16 +25,7 @@ export default function Register() {
     } finally { setLoading(false); }
   };
 
-  const handleGoogle = async (credentialResponse) => {
-    setError(''); setLoading(true);
-    try {
-      const { data } = await api.post('/auth/google', { credential: credentialResponse.credential });
-      login(data.token, data.user);
-      nav('/dashboard');
-    } catch (err) {
-      setError(err.response?.data?.error || 'Google sign-up failed');
-    } finally { setLoading(false); }
-  };
+
 
   return (
     <div className="auth-bg">
@@ -77,19 +54,6 @@ export default function Register() {
             {loading ? <span className="spinner" /> : 'Start Running'}
           </button>
 
-          <div className="auth-divider"><span>or</span></div>
-
-          <div className="google-btn-wrapper" ref={wrapperRef}>
-            <GoogleLogin
-              onSuccess={handleGoogle}
-              onError={() => setError('Google sign-up failed')}
-              theme="filled_black"
-              shape="rectangular"
-              size="large"
-              text="signup_with"
-              width={String(btnWidth)}
-            />
-          </div>
 
           <p className="auth-link">Have an account? <Link to="/login">Sign in</Link></p>
         </form>
